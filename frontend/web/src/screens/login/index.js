@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useDispatch } from "react-redux";
 
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 
 import { setUserDetails } from "../../redux/reducer/userSlider";
@@ -28,6 +37,7 @@ function Login() {
     username: `user2`,
     password: `User2@123`,
   });
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const [toggle, setToggle] = useState({
     val: false,
@@ -129,6 +139,8 @@ function Login() {
     });
   };
 
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
   return (
     <Box component="span" display={"flex"} justifyContent={"center"}>
       <Box>
@@ -151,9 +163,23 @@ function Login() {
             id="password"
             label="Password"
             variant="outlined"
+            type={showPassword ? "text" : "password"}
             sx={textInputStyle}
             onChange={(e) => onHandleChange(e, `password`)}
             required
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <Button variant="contained" onClick={onHandleSubmit} type="submit">
             Login

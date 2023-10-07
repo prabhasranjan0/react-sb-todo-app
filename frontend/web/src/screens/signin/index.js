@@ -1,10 +1,23 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@mui/material";
+
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import PersonIcon from "@mui/icons-material/Person";
-import CustomSnackbars from "../../sharedComponent/customSnackbars";
 
 import { passwordValidate, validateEmail } from "../../utils";
+import CustomSnackbars from "../../sharedComponent/customSnackbars";
+import CustomMessageModal from "../../sharedComponent/customMessageModal";
+import { signup } from "../../services/apiCollection";
+
 import {
   forgotDivStyle,
   forgotFontStyle,
@@ -14,11 +27,10 @@ import {
   textInputStyle,
   wrapperDiv,
 } from "./styles";
-import { signup } from "../../services/apiCollection";
-import CustomMessageModal from "../../sharedComponent/customMessageModal";
 
 function Signin() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const [signupData, setSignupData] = useState({
     username: ``,
     email: ``,
@@ -79,10 +91,15 @@ function Signin() {
     } else {
       let msg =
         !val && !pwd
-          ? `Email and Password are not validate`
+          ? `Email and Password are not validate,Uppercase and lowercase letters (A-Z and a-z)
+          Numeric characters (0-9)
+          Special characters - ! # $ % & ' * + - / = ?`
           : !val
-          ? `Email is not validate`
-          : `Password is not validate`;
+          ? `Email is not validate.`
+          : `Password is not validate.
+          Uppercase and lowercase letters (A-Z and a-z)
+          Numeric characters (0-9)
+          Special characters - ! # $ % & ' * + - / = ?`;
       setToggle({
         val: true,
         message: msg,
@@ -119,6 +136,8 @@ function Signin() {
     }
   };
 
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
   return (
     <Box component="span" display={"flex"} justifyContent={"center"}>
       <Box>
@@ -150,8 +169,22 @@ function Signin() {
             label="Password"
             variant="outlined"
             sx={textInputStyle}
+            type={showPassword ? "text" : "password"}
             onChange={(e) => onHandleChange(e, `password`)}
             required
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <Button variant="contained" onClick={onHandleSubmit} type="submit">
             Submit
