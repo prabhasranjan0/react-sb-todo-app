@@ -84,3 +84,10 @@ export const mainBoxStyle = {
   flexDirection: "column",
   marginBottom: 10,
 };
+
+export const paginationStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  flexDirection: { xs: "column", sm: "column", md: "row", lg: "row" },
+};

@@ -4,6 +4,7 @@ import {
   Button,
   Fab,
   Pagination,
+  TablePagination,
   TextField,
   Typography,
 } from "@mui/material";
@@ -28,6 +29,7 @@ import {
   headerTextStyle,
   inputStyle,
   mainBoxStyle,
+  paginationStyle,
   searchButtonStyle,
   textInputStyle,
 } from "./styles";
@@ -55,7 +57,7 @@ function Dashboard() {
 
   const [filterData, setFilterData] = useState({
     pageNumber: 0,
-    pageSize: 0,
+    pageSize: 5,
     total: 0,
     count: 0,
     paged: false,
@@ -72,7 +74,6 @@ function Dashboard() {
     if (Object.keys(todoList).length > 0) {
       setList([...todoList]);
       setFilterData({
-        ...filterData,
         pageNumber: pagination?.pageable?.pageNumber,
         pageSize: pagination?.pageable?.pageSize,
         total: pagination?.totalElements,
@@ -82,7 +83,6 @@ function Dashboard() {
     } else {
       setList([]);
       setFilterData({
-        ...filterData,
         pageNumber: pagination?.pageable?.pageNumber,
         pageSize: pagination?.pageable?.pageSize,
         total: pagination?.totalElements,
@@ -170,9 +170,10 @@ function Dashboard() {
       if (res?.text !== `error`) {
         dispatch(deleteTodoRTK(message["value"]));
         await onHandleFilterAPICall(
-          list.length === 1 && pagination.totalElements === 1
-            ? filterData.pageNumber
-            : filterData.pageNumber + 1
+          pagination.pageable.offset + 1 === pagination.totalElements
+            ? pagination.totalPages - 1
+            : pagination.totalPages,
+          filterData.pageSize
         );
         handleClose();
       } else {
@@ -215,16 +216,24 @@ function Dashboard() {
     setFilterData({
       ...filterData,
       pageNumber: value,
-      pageSize: 5,
     });
-    await onHandleFilterAPICall(value);
+    await onHandleFilterAPICall(value, filterData.pageSize);
   };
 
-  const onHandleFilterAPICall = async (value) => {
-    let res = await todoPagination(value, 5);
+  const onHandleFilterAPICall = async (pageNumber, pageSize) => {
+    let res = await todoPagination(pageNumber, pageSize);
     if (res?.text !== `error`) {
       dispatch(addAllToDo(res));
     }
+  };
+
+  const onRowsPerPageChange = async (event) => {
+    setFilterData({
+      ...filterData,
+      pageNumber: 1,
+      pageSize: event.target.value,
+    });
+    await onHandleFilterAPICall(1, event.target.value);
   };
 
   return (
@@ -273,11 +282,26 @@ function Dashboard() {
           <h2>{`No Todo are available. You can create one`}</h2>
         )}
         {filterData.paged && (
-          <Pagination
-            count={filterData.count}
-            onChange={onHandleChangePagination}
-            page={filterData.pageNumber + 1}
-          />
+          <Box sx={paginationStyle}>
+            <TablePagination
+              component="div"
+              count={filterData.total}
+              page={filterData.pageNumber + 1}
+              rowsPerPage={filterData.pageSize}
+              onRowsPerPageChange={onRowsPerPageChange}
+              ActionsComponent={() => null}
+              onPageChange={() => {}}
+              labelDisplayedRows={() => null}
+              rowsPerPageOptions={[5, 10, 15]}
+            />
+            <Pagination
+              count={filterData.count}
+              onChange={onHandleChangePagination}
+              page={filterData.pageNumber + 1}
+              shape="rounded"
+              variant="outlined"
+            />
+          </Box>
         )}
       </Box>
       <CustomAddTodoModal

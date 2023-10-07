@@ -110,7 +110,10 @@ export default function CustomAddTodoModal(props) {
     try {
       let res = await createTodo(param);
       if (res?.text !== `error`) {
-        await onHandleFilterAPICall(filterData.pageNumber + 1);
+        await onHandleFilterAPICall(
+          filterData.pageNumber + 1,
+          filterData.pageSize
+        );
         handleClose();
       } else {
         setMessage({
@@ -125,8 +128,8 @@ export default function CustomAddTodoModal(props) {
     }
   };
 
-  const onHandleFilterAPICall = async (value) => {
-    let res = await todoPagination(value, 5);
+  const onHandleFilterAPICall = async (pageNumber, pageSize) => {
+    let res = await todoPagination(pageNumber, pageSize);
     if (res?.text !== `error`) {
       dispatch(addAllToDo(res));
     }
