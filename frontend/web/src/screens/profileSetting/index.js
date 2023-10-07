@@ -12,8 +12,7 @@ import {
 import CustomSnackbars from "../../sharedComponent/customSnackbars";
 
 function ProfileSetting() {
-  const userData = useSelector((state) => state.user.user);
-  const [user, setUser] = useState(userData);
+  const { user } = useSelector((state) => state.user);
   const [toggle, setToggle] = useState({
     val: false,
     message: ``,
@@ -22,25 +21,6 @@ function ProfileSetting() {
 
   const onHandleUpdate = (e) => {
     e.preventDefault();
-    // if (user?.name?.length <= 0 || user?.name === userData.name) {
-    //   setToggle({
-    //     val: true,
-    //     message:
-    //       user?.name === userData.name
-    //         ? `Please update user name`
-    //         : `Name field is mandatory.`,
-    //     severity: "warning",
-    //   });
-    //   return;
-    // }
-
-    // dispatch(setUserDetails(user));
-    // setToggle({
-    //   val: true,
-    //   message: `User details are updated`,
-    //   severity: "success",
-    // });
-    // console.log("onHandleUpdate");
   };
 
   const handleClose = (event, reason) => {
