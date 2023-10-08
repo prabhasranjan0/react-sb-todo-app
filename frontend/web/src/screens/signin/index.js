@@ -13,7 +13,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import PersonIcon from "@mui/icons-material/Person";
 
-import { passwordValidate, validateEmail } from "../../utils";
+import { delayFunction, passwordValidate, validateEmail } from "../../utils";
 import CustomSnackbars from "../../sharedComponent/customSnackbars";
 import CustomMessageModal from "../../sharedComponent/customMessageModal";
 import { signup } from "../../services/apiCollection";
@@ -72,22 +72,28 @@ function Signin() {
     let val = validateEmail(signupData, setToggle);
     let pwd = passwordValidate(signupData, setToggle);
     if (val && pwd) {
-      let res = await signup({ ...signupData });
-      if (res?.text !== `error`) {
-        setMessage({
-          toggle: true,
-          title: `Auth Signup Response`,
-          description: res.message,
-          value: "success",
-        });
-      } else {
-        setMessage({
-          toggle: true,
-          title: `Auth Signup Response`,
-          description: res?.error?.message,
-          value: "error",
-        });
-      }
+      delayFunction(async () => {
+        try {
+          let res = await signup({ ...signupData });
+          if (res?.text !== `error`) {
+            setMessage({
+              toggle: true,
+              title: `Auth Signup Response`,
+              description: res.message,
+              value: "success",
+            });
+          } else {
+            setMessage({
+              toggle: true,
+              title: `Auth Signup Response`,
+              description: res?.error?.response?.data?.message,
+              value: "error",
+            });
+          }
+        } catch (error) {
+          console.log("catch error =>", error);
+        }
+      }, 2000);
     } else {
       let msg =
         !val && !pwd

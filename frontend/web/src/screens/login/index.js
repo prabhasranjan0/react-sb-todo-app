@@ -34,8 +34,8 @@ import CustomMessageModal from "../../sharedComponent/customMessageModal";
 function Login() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({
-    username: `user2`,
-    password: `User2@123`,
+    username: ``,
+    password: ``,
   });
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
@@ -88,13 +88,13 @@ function Login() {
             message: `Login Successfully`,
             severity: "success",
           });
-          await apiCall();
+          // await apiCall();
           navigate("/dashboard");
         } else {
           setMessage({
             toggle: true,
-            title: `Auth Sign In Response`,
-            description: res?.error?.message,
+            title: res?.error?.response?.data?.error || "",
+            description: res?.error?.response?.data?.message || "",
             value: "error",
           });
         }
@@ -126,7 +126,6 @@ function Login() {
   };
 
   const onHandleNavigateSignIn = () => {
-    console.log("navigate");
     navigate("/signin");
   };
 

@@ -23,6 +23,7 @@ import {
   updateTodo,
 } from "../../services/apiCollection";
 import CustomMessageModal from "../customMessageModal";
+import { setActiveLoader } from "../../redux/reducer/userSlider";
 
 export default function CustomAddTodoModal(props) {
   const {
@@ -62,11 +63,16 @@ export default function CustomAddTodoModal(props) {
       });
       return;
     }
-
     if (isEdit) {
-      onHandleUpdateTodo();
+      dispatch(setActiveLoader(true));
+      setTimeout(async () => {
+        onHandleUpdateTodo();
+      }, 2000);
     } else {
-      await onHandleCreateTodo();
+      dispatch(setActiveLoader(true));
+      setTimeout(async () => {
+        await onHandleCreateTodo();
+      }, 2000);
     }
   };
 
@@ -166,7 +172,7 @@ export default function CustomAddTodoModal(props) {
       <DialogTitle id="todo-dialog-title">
         {isEdit ? "Update current Todo" : "Create a new Todo "}
       </DialogTitle>
-      <DialogContent>
+      <DialogContent dividers>
         <Box
           component={"span"}
           display={"flex"}
