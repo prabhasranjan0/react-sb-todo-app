@@ -28,9 +28,11 @@ export default function CustomMessageModal(props) {
       keepMounted
       onClose={onHandleClose}
       aria-describedby="message-alert-dialog-slide-description"
+      fullWidth
+      maxWidth="sm"
     >
       <DialogTitle>{title}</DialogTitle>
-      <DialogContent>
+      <DialogContent dividers>
         <DialogContentText id="message-alert-dialog-slide-description">
           {description}
         </DialogContentText>
