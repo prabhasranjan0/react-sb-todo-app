@@ -33,6 +33,7 @@ import {
   searchButtonStyle,
   textInputStyle,
 } from "./styles";
+import { setActiveLoader } from "../../redux/reducer/userSlider";
 
 function Dashboard() {
   const { todoList, pagination } = useSelector((state) => state.todo);
@@ -71,7 +72,24 @@ function Dashboard() {
   });
 
   useEffect(() => {
-    if (Object.keys(todoList).length > 0) {
+    console.log("api call not happen");
+    if (todoList && Object.keys(todoList).length > 0) return;
+    dispatch(setActiveLoader(true));
+    setTimeout(async () => {
+      console.log("api call happen");
+      await apiCall();
+    }, 2000);
+  }, []);
+
+  const apiCall = async () => {
+    let res = await todoPagination(1, 5);
+    if (res?.text !== `error`) {
+      dispatch(addAllToDo(res));
+    }
+  };
+
+  useEffect(() => {
+    if (todoList && Object.keys(todoList).length > 0) {
       setList([...todoList]);
       setFilterData({
         pageNumber: pagination?.pageable?.pageNumber,
@@ -165,30 +183,33 @@ function Dashboard() {
   };
 
   const onHandleConfirmDelete = async () => {
+    if (message["value"] === "error") {
+      onHandleClose();
+      return;
+    }
     try {
       let res = await deleteTodo(message["value"]["id"]);
       if (res?.text !== `error`) {
         dispatch(deleteTodoRTK(message["value"]));
         await onHandleFilterAPICall(
           pagination.pageable.offset + 1 === pagination.totalElements
-            ? pagination.totalPages - 1
-            : pagination.totalPages,
+            ? pagination.number
+            : pagination.number + 1,
           filterData.pageSize
         );
         handleClose();
+        onHandleClose();
       } else {
         setMessage({
           toggle: true,
           title: `TODO Remove Service`,
-          description: res?.error?.message,
+          description: res?.error?.message || `API Error`,
           value: "error",
         });
       }
     } catch (error) {
       console.log("catch error ==>", error);
     }
-
-    onHandleClose();
   };
 
   const onHandleClose = () => {
@@ -331,10 +352,15 @@ function Dashboard() {
           open={message["toggle"]}
           title={message["title"]}
           description={message["description"]}
-          isCancle={true}
+          isCancle={message["value"] === "error" ? false : true}
           isOk={true}
-          okText={`yes`}
-          onHandleOkay={onHandleConfirmDelete}
+          okText={message["value"] === "error" ? `Ok` : `yes`}
+          onHandleOkay={() => {
+            dispatch(setActiveLoader(true));
+            setTimeout(() => {
+              onHandleConfirmDelete();
+            }, 2000);
+          }}
           onHandleClose={onHandleClose}
           onHandleCancel={onHandleClose}
         />
